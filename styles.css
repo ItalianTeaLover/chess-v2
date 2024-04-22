@@ -38,11 +38,11 @@
     z-index: 9; /* this ensures that the pieces is always in front the square. This ensures that we're dragging and replacing the actual pieces, not the squares */
   }
   
-  .black {
+  .piece.black svg {
     fill: rgb(24, 24, 24);
   }
   
-  .white {
+  .piece.white svg {
     fill: rgb(216, 146, 180);
   }
   

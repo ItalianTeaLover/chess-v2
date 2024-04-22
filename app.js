@@ -70,46 +70,77 @@ const initialGameState = {
 // the gameState is what you would want to save
 const gameState = initialGameState; // Model
 
-// ==================== VIEW LOGIC ==============================//
+// ==================== VIEW LOGIC (BROWSER) ==============================//
 
 const gameBoard = document.getElementById("gameboard");
 const playerDisplay = document.getElementById("player");
 const infoDisplay = document.getElementById("inf-display");
 
 function showGameInBrowser() {
-   showBoardInBrowser();
-   showPlayerInBrowser();
+  showBoardInBrowser();
+  showPlayerInBrowser();
 }
 
 function showBoardInBrowser() {
-    for (let r = 0; r < gameState.board.length; r++) {
-        const row = gameState.board[r];
-        let rowString = "";
-        for (let c = 0; c < row.length(); c++) {
-          const piece = row[c];
-          const square = document.createElement("div"); 
-          square.classList.add("square"); 
-          square.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
-          square.innerHTML = null; // TODO: If piece is not nulla, actually put its symbol here. Also set correct colour
-          gameBoard.append(square); 
-}
+  for (let r = 0; r < gameState.board.length; r++) {
+    const row = gameState.board[r];
+    let rowString = "";
+    for (let c = 0; c < row.length(); c++) {
+      const piece = row[c];
+      const square = document.createElement("div");
+      square.classList.add("square");
+      square.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
+      square.innerHTML = piece === null ? null : pieceToDomElement(piece); // TODO: If piece is not nulla, actually put its symbol here. Also set correct colour
+      gameBoard.append(square);
     }
+  }
 }
 
 function showPlayerInBrowser() {
-    playerDisplay.textContent = gameState.currentPlayer;
+  playerDisplay.textContent = gameState.currentPlayer;
 }
 
-// ========= //
+// Takes { type: <string>, color: 'white' | 'black' } and returns a dom element representing this piece
+function pieceToDomElement(piece) {
+  const piece = null;
+  switch (piece.type) {
+    case "rook":
+      piece = "rook";
+      break;
+    case "knight":
+      piece = "knight";
+      break;
+    case "bishop":
+      piece = "bishop";
+      break;
+    case "queen":
+      piece = "queen";
+      break;
+    case "king":
+      piece = "king";
+      break;
+    case "pawn":
+      piece = "pawn";
+      break;
+    default:
+      throw "Invalid piece!";
+  }
+
+  piece.classList.add(piece.color); // TODO: will this result at some point with both white and black being added?
+
+  return piece;
+}
+
+// ========= VIEW LOGIC (CONSOLE) ===========//
 
 function printGameToConsole() {
-    console.log('==========');
-    printBoardToConsole();
-    printTurnToconsole();
+  console.log("==========");
+  printBoardToConsole();
+  printTurnToconsole();
 }
 
 function printTurnToconsole() {
-    consolel.log(`It is ${gameState.currentPlayer}'s turn.`);
+  consolel.log(`It is ${gameState.currentPlayer}'s turn.`);
 }
 
 function printBoardToConsole() {
@@ -123,7 +154,7 @@ function printBoardToConsole() {
       const piece = row[c];
       rowString += piece === null ? " - " : pieceToString(piece);
     }
-    console.log("%c[" + r + "]" + rowString);
+    console.log("[" + r + "]" + rowString);
   }
 }
 
@@ -170,22 +201,21 @@ function movePiece(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
 }
 
 function toggleWhoseTurnItIs() {
-    gameState.currentPlayer = gameState.currentPlayer === 'white'  ? 'black' : 'white';
+  gameState.currentPlayer =
+    gameState.currentPlayer === "white" ? "black" : "white";
 }
 
 // =================== UTILITY FUNCTIONS =================== //
 
 function isEven(x) {
-    return x % 2 === 0;
+  return x % 2 === 0;
 }
 // =================== TOP LEVEL LOGIC =================== //
 
 printGameToConsole();
 showGameInBrowser();
 
-movePiece(0, 0, 5, 5) // move piece from 00 to 44.
+movePiece(0, 0, 5, 5); // move piece from 00 to 55.
 toggleWhoseTurnItIs();
 
 printGameToConsole();
-
-
