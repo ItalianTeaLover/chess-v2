@@ -13,6 +13,7 @@
 // Model - Describe how the chess board will be saved, without thinking how it will be displayed
 
 // ===================== MODEL LOGIC ============================ //
+
 const initialBoard = [
   [
     { type: "rook", color: "white" }, // each of these lines represents a piece
@@ -82,18 +83,26 @@ function showGameInBrowser() {
 }
 
 function showBoardInBrowser() {
+  gameBoard.clear();
+  // replaceChildren()
+
+  const squareElems = [];
   for (let r = 0; r < gameState.board.length; r++) {
     const row = gameState.board[r];
-    let rowString = "";
     for (let c = 0; c < row.length(); c++) {
       const piece = row[c];
+
       const square = document.createElement("div");
       square.classList.add("square");
       square.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
-      square.innerHTML = piece === null ? null : pieceToDomElement(piece); // TODO: If piece is not nulla, actually put its symbol here. Also set correct colour
-      gameBoard.append(square);
+      if (piece !== null) {
+        squareElem.appendChild(pieceToDomElement(piece));
+      }
+
+      squareElems.push(squareElem);
     }
   }
+  gameBoardElem.replaceChildren(...squareElems);
 }
 
 function showPlayerInBrowser() {
@@ -102,33 +111,36 @@ function showPlayerInBrowser() {
 
 // Takes { type: <string>, color: 'white' | 'black' } and returns a dom element representing this piece
 function pieceToDomElement(piece) {
-  const piece = null;
+  let pieceElementHtml = null;
+
   switch (piece.type) {
     case "rook":
-      piece = "rook";
+      pieceElementHtml = "rook";
       break;
     case "knight":
-      piece = "knight";
+      pieceElementHtml = "knight";
       break;
     case "bishop":
-      piece = "bishop";
+      pieceElementHtml = "bishop";
       break;
     case "queen":
-      piece = "queen";
+      pieceElementHtml = "queen";
       break;
     case "king":
-      piece = "king";
+      pieceElementHtml = "king";
       break;
     case "pawn":
-      piece = "pawn";
+      pieceElementHtml = "pawn";
       break;
     default:
       throw "Invalid piece!";
   }
 
-  piece.classList.add(piece.color); // TODO: will this result at some point with both white and black being added?
+  const pieceElement = createDomElementFromHTML(pieceElementHtml);
 
-  return piece;
+  pieceElement.classList.add(piece.color);
+
+  return pieceElement;
 }
 
 // ========= VIEW LOGIC (CONSOLE) ===========//
@@ -210,6 +222,14 @@ function toggleWhoseTurnItIs() {
 function isEven(x) {
   return x % 2 === 0;
 }
+
+function createDomElementFromHTML(htmlString) {
+  let tempDiv = document.createElement("div");
+  tempDiv.innerHTML = htmlString;
+  let newElement = tempDiv.firstElementChild;
+  return newElement;
+}
+
 // =================== TOP LEVEL LOGIC =================== //
 
 printGameToConsole();
@@ -219,3 +239,4 @@ movePiece(0, 0, 5, 5); // move piece from 00 to 55.
 toggleWhoseTurnItIs();
 
 printGameToConsole();
+showGameInBrowser();
