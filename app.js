@@ -271,7 +271,7 @@ function checkIfMoveIsValid(startRowIdx, startColIdx, endRowIdx, endColIdx) {
 function movePiece(startRowIdx, startColIdx, endRowIdx, endColIdx) {
   const piece = gameState.board[startRowIdx][startColIdx];
   gameState.board[startRowIdx][startColIdx] = null;
-  gameState.board[endRowIdx][endColIdxc] = piece;
+  gameState.board[endRowIdx][endColIdx] = piece;
 }
 
 function toggleWhoseTurnItIs() {
