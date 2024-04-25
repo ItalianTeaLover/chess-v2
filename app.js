@@ -66,6 +66,7 @@ const initialBoard = [
 const initialGameState = {
   board: initialBoard,
   currentPlayer: "white",
+  infoMessage: null,
 };
 
 // the gameState is what you would want to save
@@ -80,28 +81,53 @@ const infoDisplay = document.getElementById("inf-display");
 function showGameInBrowser() {
   showBoardInBrowser();
   showPlayerInBrowser();
+  showInfoMessageInBrowser();
 }
 
-function showBoardInBrowser() {
-  gameBoard.clear();
-  // replaceChildren()
+function showInfoMessageInBrowser() {
+  infoDisplay.textContent = gameState.infoMessage;
+}
 
+let draggedPieceCurrentRowAndCol = null; // {r, c}
+
+function showBoardInBrowser() {
   const squareElems = [];
   for (let r = 0; r < gameState.board.length; r++) {
     const row = gameState.board[r];
     for (let c = 0; c < row.length(); c++) {
       const piece = row[c];
 
-      const square = document.createElement("div");
-      square.classList.add("square");
-      square.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
+      const squareElem = document.createElement("div");
+      squareElem.classList.add("square");
+      squareElem.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
       if (piece !== null) {
         squareElem.appendChild(pieceToDomElement(piece));
       }
+      squareElems.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+      });
+      squareElems.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        draggedPieceCurrentRowAndCol = { r, c };
+      });
+      squareElems.addEventListener("dragend", (event) => {
+        event.preventDefault();
+        // TODO: This is not the best solution, as it puts piece at least square it moved over
+        // even if it wasn't dropped at that square but e.g. outside of the board.
+        // But I couldn't get drop event to trigger, so this is how I got it working for now.
+        // I should instead get this working via drop event.
+        performMove(
+          r,
+          c,
+          draggedPieceCurrentRowAndCol.r,
+          draggedPieceCurrentRowAndCol.c
+        );
+      });
 
       squareElems.push(squareElem);
     }
   }
+
   gameBoardElem.replaceChildren(...squareElems);
 }
 
@@ -139,6 +165,7 @@ function pieceToDomElement(piece) {
   const pieceElement = createDomElementFromHTML(pieceElementHtml);
 
   pieceElement.classList.add(piece.color);
+  pieceElement.setAttribute("draggable", true);
 
   return pieceElement;
 }
@@ -149,6 +176,14 @@ function printGameToConsole() {
   console.log("==========");
   printBoardToConsole();
   printTurnToconsole();
+  printInfoMessageToConsole();
+}
+
+function printInfoMessageToConsole() {
+  if (gameState.infoMessage) {
+    // if there is something to print
+    console.log("INFO: ", gameState.infoMessage); // print this message
+  }
 }
 
 function printTurnToconsole() {
@@ -206,10 +241,42 @@ function pieceToString(piece) {
 
 // =================== CONTROLLER LOGIC ================= //
 
+function performMove(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
+  const moveValidity = checkIfMoveIsValid(
+    startRowIdx,
+    startColIdx,
+    endRowIdx,
+    endColIdxc
+  );
+  if (moveValidity === true) {
+    gameState.infoMessage = null;
+    movePiece(startRowIdx, startColIdx, endRowIdx, endColIdxc);
+    toggleWhoseTurnItIs();
+  } else {
+    gameState.infoMessage = moveValidity.error;
+  }
+  // TODO: Check if game is over, and if so do something about it.
+  showGameInBrowser();
+  printGameToConsole();
+}
+
+// If move is valid, return true.
+// If move is invalid, return { error: <string>}
+function checkIfMoveIsInvalid(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
+  const piece = gameState.board[startRowIdx][startColIdx];
+
+  if (piece.color !== gameState.currentPlayer) {
+    return { error: "It's not your turn" };
+  }
+
+  // TODO: Add all the rules!
+
+  return true;
+}
 function movePiece(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
-  gameState.board[endRowIdx][endColIdxc] =
-    gameState.board[startRowIdx][startColIdx]; // add piece to initial location
-  gameState.board[startRowIdx][startColIdx] = null; // remove piece from initial location
+  const piece = gameState.board[startRowIdx][startColIdx];
+  gameState.board[startRowIdx][startColIdx] = null;
+  gameState.board[endRowIdx][endColIdxc] = piece;
 }
 
 function toggleWhoseTurnItIs() {
@@ -232,11 +299,5 @@ function createDomElementFromHTML(htmlString) {
 
 // =================== TOP LEVEL LOGIC =================== //
 
-printGameToConsole();
 showGameInBrowser();
-
-movePiece(0, 0, 5, 5); // move piece from 00 to 55.
-toggleWhoseTurnItIs();
-
 printGameToConsole();
-showGameInBrowser();
