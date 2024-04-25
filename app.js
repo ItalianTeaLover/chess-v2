@@ -257,7 +257,7 @@ function performMove(startRowIdx, startColIdx, endRowIdx, endColIdx) {
 
 // If move is valid, return true.
 // If move is invalid, return { error: <string>}
-function checkIfMoveIsInvalid(startRowIdx, startColIdx, endRowIdx, endColIdx) {
+function checkIfMoveIsValid(startRowIdx, startColIdx, endRowIdx, endColIdx) {
   const piece = gameState.board[startRowIdx][startColIdx];
 
   if (piece.color !== gameState.currentPlayer) {
