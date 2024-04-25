@@ -69,14 +69,14 @@ const initialGameState = {
   infoMessage: null,
 };
 
-// the gameState is what you would want to save
-const gameState = initialGameState; // Model
+// the gameState is what you want to save throghout the game --> It's the actual Model
+const gameState = initialGameState;
 
-// ==================== VIEW LOGIC (BROWSER) ==============================//
+// ==================== VIEW LOGIC (BROWSER) ============================== //
 
-const gameBoard = document.getElementById("gameboard");
-const playerDisplay = document.getElementById("player");
-const infoDisplay = document.getElementById("inf-display");
+const gameBoardElem = document.getElementById("gameboard");
+const playerDisplayElem = document.getElementById("player");
+const infoDisplayElem = document.getElementById("inf-display");
 
 function showGameInBrowser() {
   showBoardInBrowser();
@@ -85,7 +85,7 @@ function showGameInBrowser() {
 }
 
 function showInfoMessageInBrowser() {
-  infoDisplay.textContent = gameState.infoMessage;
+  infoDisplayElem.textContent = gameState.infoMessage;
 }
 
 let draggedPieceCurrentRowAndCol = null; // {r, c}
@@ -99,18 +99,17 @@ function showBoardInBrowser() {
 
       const squareElem = document.createElement("div");
       squareElem.classList.add("square");
-      squareElem.classList.add(isEven(r + c) === 0 ? "bright" : "dark");
+      squareElem.classList.add(isEven(r + c) ? "bright" : "dark");
       if (piece !== null) {
         squareElem.appendChild(pieceToDomElement(piece));
       }
-      squareElems.addEventListener("dragstart", (event) => {
-        event.preventDefault();
-      });
-      squareElems.addEventListener("dragover", (event) => {
+
+      squareElem.addEventListener("dragstart", (event) => {});
+      squareElem.addEventListener("dragover", (event) => {
         event.preventDefault();
         draggedPieceCurrentRowAndCol = { r, c };
       });
-      squareElems.addEventListener("dragend", (event) => {
+      squareElem.addEventListener("dragend", (event) => {
         event.preventDefault();
         // TODO: This is not the best solution, as it puts piece at least square it moved over
         // even if it wasn't dropped at that square but e.g. outside of the board.
@@ -123,7 +122,6 @@ function showBoardInBrowser() {
           draggedPieceCurrentRowAndCol.c
         );
       });
-
       squareElems.push(squareElem);
     }
   }
@@ -132,7 +130,7 @@ function showBoardInBrowser() {
 }
 
 function showPlayerInBrowser() {
-  playerDisplay.textContent = gameState.currentPlayer;
+  playerDisplayElem.textContent = gameState.currentPlayer;
 }
 
 // Takes { type: <string>, color: 'white' | 'black' } and returns a dom element representing this piece
@@ -141,22 +139,22 @@ function pieceToDomElement(piece) {
 
   switch (piece.type) {
     case "rook":
-      pieceElementHtml = "rook";
+      pieceElementHtml = rookElement;
       break;
     case "knight":
-      pieceElementHtml = "knight";
+      pieceElementHtml = knightElement;
       break;
     case "bishop":
-      pieceElementHtml = "bishop";
+      pieceElementHtml = bishopElement;
       break;
     case "queen":
-      pieceElementHtml = "queen";
+      pieceElementHtml = queenElement;
       break;
     case "king":
-      pieceElementHtml = "king";
+      pieceElementHtml = kingElement;
       break;
     case "pawn":
-      pieceElementHtml = "pawn";
+      pieceElementHtml = pawnElement;
       break;
     default:
       throw "Invalid piece!";
@@ -191,12 +189,9 @@ function printTurnToconsole() {
 }
 
 function printBoardToConsole() {
-  // print the board row by row
-  console.log("==========");
   for (let r = 0; r < gameState.board.length; r++) {
     const row = gameState.board[r];
     let rowString = "";
-    // print each row piece by piece
     for (let c = 0; c < row.length(); c++) {
       const piece = row[c];
       rowString += piece === null ? " - " : pieceToString(piece);
@@ -241,16 +236,16 @@ function pieceToString(piece) {
 
 // =================== CONTROLLER LOGIC ================= //
 
-function performMove(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
+function performMove(startRowIdx, startColIdx, endRowIdx, endColIdx) {
   const moveValidity = checkIfMoveIsValid(
     startRowIdx,
     startColIdx,
     endRowIdx,
-    endColIdxc
+    endColIdx
   );
   if (moveValidity === true) {
     gameState.infoMessage = null;
-    movePiece(startRowIdx, startColIdx, endRowIdx, endColIdxc);
+    movePiece(startRowIdx, startColIdx, endRowIdx, endColIdx);
     toggleWhoseTurnItIs();
   } else {
     gameState.infoMessage = moveValidity.error;
@@ -262,7 +257,7 @@ function performMove(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
 
 // If move is valid, return true.
 // If move is invalid, return { error: <string>}
-function checkIfMoveIsInvalid(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
+function checkIfMoveIsInvalid(startRowIdx, startColIdx, endRowIdx, endColIdx) {
   const piece = gameState.board[startRowIdx][startColIdx];
 
   if (piece.color !== gameState.currentPlayer) {
@@ -273,7 +268,7 @@ function checkIfMoveIsInvalid(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
 
   return true;
 }
-function movePiece(startRowIdx, startColIdx, endRowIdx, endColIdxc) {
+function movePiece(startRowIdx, startColIdx, endRowIdx, endColIdx) {
   const piece = gameState.board[startRowIdx][startColIdx];
   gameState.board[startRowIdx][startColIdx] = null;
   gameState.board[endRowIdx][endColIdxc] = piece;
