@@ -122,6 +122,7 @@ function showBoardInBrowser() {
           draggedPieceCurrentRowAndCol.c
         );
       });
+
       squareElems.push(squareElem);
     }
   }
