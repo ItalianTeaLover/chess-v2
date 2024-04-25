@@ -94,7 +94,7 @@ function showBoardInBrowser() {
   const squareElems = [];
   for (let r = 0; r < gameState.board.length; r++) {
     const row = gameState.board[r];
-    for (let c = 0; c < row.length(); c++) {
+    for (let c = 0; c < row.length; c++) {
       const piece = row[c];
 
       const squareElem = document.createElement("div");
